@@ -16,27 +16,54 @@ Promise.all([
 ]).then(function(responses){return Promise.all(responses.map(function(response){return response.json()}))} ).then(mostrarData);
 
 function masVendido(data){
-    console.log(data);
     var array = data;
     let x = 0;
     let objeto;
-
     for(let i = 0; i < array.length;i++)
     {
+        let y = 0;
+        let idtemp;
         var obj = array[i];
         for(var key in obj)
         {
             var name = key;
             var value = parseInt(obj[key]);
-            if(name == "cantidad" && value > x)
+            if(name == "idproducto")
             {
-                x = value;
-                objeto = obj;
+                idtemp = value;
+            }
+            else if(name == "cantidad")
+            {
+                y += value;
             }
         }
+        
+        for(let j = i+1; j < array.length;j++)
+        {
+            var objj = array[j];
+            for(var keyy in objj)
+            {
+                var name = keyy;
+                var value = parseInt(objj[keyy]);
+                if(name == "idproducto" && value !==idtemp)
+                {
+                    break;
+                }
+                else if(name == "cantidad" )
+                {
+                    y += value;
+                    delete array[j];
+                }
+             }
+        }
+        
+        if(y > x )
+        {
+            x = y;
+            objeto = obj;
+        }
+        delete array[i];
     }
-    console.log(x);
-    console.log(objeto);
 
     var respuesta;
     for(var key in objeto)
@@ -51,13 +78,11 @@ function masVendido(data){
     respuesta += x;
 
     console.log("Cantidad de veces pedido: "+x);
-    console.log(respuesta);
     return respuesta;
 }
 
 function mostrarProducto(data2, idbuscado)
 {
-    console.log(data2);
     var temp = idbuscado;
     var split = temp.split(":");
     var id = split[0];
@@ -77,7 +102,6 @@ function mostrarProducto(data2, idbuscado)
             }
         }
     }
-    console.log(objeto2);
 
     var respuesta = "El producto más vendido se llama: ";
     for(var key in objeto2)
